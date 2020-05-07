@@ -17,12 +17,16 @@ This script helps in automating compress/decompress of system.new.dat files.
  *  git clone $this_repo --recursive
 
 
-Usage
+## Usage
 
 ```
 chmod +x start.sh
 ./start.sh
 ```
+
+## Preview
+
+![Screenshot of my desktop](https://github.com/Creator54/android-image-modifier/blob/master/preview.png)
 
 ## Credits 
 
