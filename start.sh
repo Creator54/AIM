@@ -14,8 +14,10 @@ echo
 
 echo "Enter system.transfer.list location"
 read file1
+file1+=/system.transfer.list
 echo "Enter system.new.dat location"
 read file2
+file2+=/system.new.dat
 
 if [[ -f "$file1" ]] && [[ -f "$file2" ]]; then
 	
