@@ -13,6 +13,9 @@ echo "#######################################"
 echo
 
 read -p "Enter location of extracted files : " loc
+if [[ -e "$loc/system.new.dat.br" ]]; then
+	brotli -f -d $loc/system.new.dat.br
+fi
 file1=$loc/system.transfer.list
 file2=$loc/system.new.dat
 
@@ -62,12 +65,19 @@ if [[ -f "$file1" ]] && [[ -f "$file2" ]]; then
     	echo
     	mkdir $f2/dat
     	./img2sdat/img2sdat.py $sparse -o $f2/dat
+    	if [[ -e "$loc/system.new.dat.br" ]]; then
+    		echo "System supports brotli compression ."
+    		echo " 1 - fastest/least compression"
+    		echo " 6 - default aosp compression"
+    		echo "11 - slowest/max compression"
+    		read -p "Enter compression level : " l
+			brotli -f -$l $f2/dat/system.new.dat
+		fi
     	echo
     	echo "Compressed raw image to sparse data."
-    	echo "Process finished."
-	else
-    	echo "Script terminated."
+    	echo
 	fi
 else
 	echo "Files not found."
 fi
+echo "Script terminated."
