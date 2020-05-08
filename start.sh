@@ -12,12 +12,9 @@ echo "         Android Image Modifier        "
 echo "#######################################"
 echo
 
-echo "Enter system.transfer.list location"
-read file1
-file1+=/system.transfer.list
-echo "Enter system.new.dat location"
-read file2
-file2+=/system.new.dat
+read -p "Enter location of extracted files : " loc
+file1=$loc/system.transfer.list
+file2=$loc/system.new.dat
 
 if [[ -f "$file1" ]] && [[ -f "$file2" ]]; then
 	
@@ -40,8 +37,7 @@ if [[ -f "$file1" ]] && [[ -f "$file2" ]]; then
 	else
 		echo 
 		echo "Default path $f1 does not exist"
-		echo "specify path to mount"
-		read f1
+		read -p "specify path to mount" f1
 		if [ -e "$f1" ]; then
 			echo "Mounting image"
 		else
@@ -55,7 +51,7 @@ if [[ -f "$file1" ]] && [[ -f "$file2" ]]; then
 	echo "Now make required changes to the image."
 	echo
 
-	read -n1 -r -p "Press any key to start repacking..." key
+	read -p "Press any key to start repacking..." key
 
 	if [ "$key" = '' ]; then
     	sudo umount $f1
@@ -70,9 +66,8 @@ if [[ -f "$file1" ]] && [[ -f "$file2" ]]; then
     	echo "Compressed raw image to sparse data."
     	echo "Process finished."
 	else
-    	echo "Wrong key."
+    	echo "Script terminated."
 	fi
 else
 	echo "Files not found."
-	echo "Copy system.transfer.list & system.new.dat to input."
 fi
