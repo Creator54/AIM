@@ -1,9 +1,9 @@
 #!/bin/bash
 
-f1="/media/iso"
-f2="output"
-sys="$f2/system.img"
-sparse="$f2/system_sparse.img"
+f1=tmp
+f2=system
+sys=$f1/system.img
+sparse=$f1/system_sparse.img
 
 clear
 
@@ -11,73 +11,68 @@ echo "#######################################"
 echo "         Android Image Modifier        "
 echo "#######################################"
 echo
+zip_file="$(ls -a | grep .zip)"
+if [[ -e "$zip_file" ]]; then
+	mkdir $f1 $f2
+	unzip $zip_file -d $f1
+	loc=$f1
+	if [[ -e "$loc/system.new.dat.br" ]]; then
+		brotli -f -d $loc/*.br
+	fi
+	file1=$loc/system.transfer.list
+	file2=$loc/system.new.dat
 
-read -p "Enter location of extracted files : " loc
-if [[ -e "$loc/system.new.dat.br" ]]; then
-	brotli -f -d $loc/system.new.dat.br
-fi
-file1=$loc/system.transfer.list
-file2=$loc/system.new.dat
-
-if [[ -f "$file1" ]] && [[ -f "$file2" ]]; then
+	if [[ -f "$file1" ]] && [[ -f "$file2" ]]; then
 	
-	echo
-	echo Files found
-	echo
-	echo "Decompressing DAT (sparse data) -> EXT4 (raw image)"
-	echo 
-
-	if [[ -e "$f2" ]]; then
-		echo output folder exists
-	else
-		mkdir $f2
-	fi 
-	
-	./sdat2img/sdat2img.py $file1 $file2 $sys | grep Done!
-	
-	if [ -e "$f1" ]; then
-		echo "Mounting image"
-	else
+		echo
+		echo "Decompressing DAT (sparse data) -> EXT4 (raw image)"
 		echo 
-		echo "Default path $f1 does not exist"
-		read -p "specify path to mount" f1
-		if [ -e "$f1" ]; then
-			echo "Mounting image"
-		else
-			exit 1
-		fi
+	
+		./sdat2img/sdat2img.py $file1 $file2 $sys | grep Done!
+	
+		sudo mount -t ext4 -o loop $sys $f2
+		echo
+		echo "Image mounted at $f2"
+		echo
+		echo "Now make required changes to the image."
+		echo
+		
+		read -p "Press Enter to start repacking..." key
+		if [ "$key" = '' ]; then
+    		sudo umount $f2
+    		echo " "
+    		echo Image unmounted
+    		img2simg $sys $sparse
+    		echo
+    		echo Converting to sparse_img complete.
+   		 	echo
+	    	if [[ -e "$loc/system.new.dat.br" ]]; then
+    			./img2sdat/img2sdat.py $sparse -o $f1 -v 4
+    			echo
+    			echo "System supports brotli compression ."
+    			echo
+    			echo " 1 - fastest/least compression"
+    			echo " 6 - default aosp compression"
+    			echo "11 - slowest/max compression"
+    			echo
+    			read -p "Enter compression level(1-11): " l
+				brotli -f -$l $f1/system.new.dat
+				echo
+			else
+				./img2sdat/img2sdat.py $sparse -o $f1
+			fi
+    	fi
 	fi
-	sudo mount -t ext4 -o loop $sys $f1
+	echo Zipping up
 	echo
-	echo "Image mounted at $f1"
-	echo
-	echo "Now make required changes to the image."
-	echo
-
-	read -p "Press any key to start repacking..." key
-
-	if [ "$key" = '' ]; then
-    	sudo umount $f1
-    	echo " "
-    	echo Image unmounted
-    	img2simg $sys $sparse
-    	echo Converting to sparse_img complete.
-    	echo
-    	mkdir $f2/dat
-    	./img2sdat/img2sdat.py $sparse -o $f2/dat
-    	if [[ -e "$loc/system.new.dat.br" ]]; then
-    		echo "System supports brotli compression ."
-    		echo " 1 - fastest/least compression"
-    		echo " 6 - default aosp compression"
-    		echo "11 - slowest/max compression"
-    		read -p "Enter compression level : " l
-			brotli -f -$l $f2/dat/system.new.dat
-		fi
-    	echo
-    	echo "Compressed raw image to sparse data."
-    	echo
+	if [[ -e "$loc/system.new.dat.br" ]]; then
+		rm $f1/system.new.dat
 	fi
+	rm $sys $sparse && cd $f1 && zip test_ROM.zip -r *
+	mv test_ROM.zip ../ && cd ../ && rm -rf $f1 $f2
+	echo
+	echo "All Done. Time for testing :)"
+	echo
 else
-	echo "Files not found."
+	echo "Copy ROM zip to this folder."
 fi
-echo "Script terminated."
