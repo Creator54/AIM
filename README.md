@@ -19,6 +19,7 @@ This script helps in automating compress/decompress of system.new.dat/system.new
      Arch: pacman -S aur/simg-tools
            ```
  *  git clone $this_repo --recursive
+ *  copy of a working ROM
 
 
 ## Usage
