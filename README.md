@@ -2,10 +2,14 @@
 
 ## About
 
-This script helps in automating compress/decompress of system.new.dat files.
+This script helps in automating compress/decompress of system.new.dat/system.new.dat.br files.
 
 ## Requirements 
 
+* brotli
+         ```
+   Arch: pacman -S brotli
+         ```
  * python 
          ```
    Arch: pacman -S python
@@ -19,6 +23,7 @@ This script helps in automating compress/decompress of system.new.dat files.
 
 ## Usage
 
+Copy ROM.zip to this dir
 ```
 chmod +x start.sh
 ./start.sh
