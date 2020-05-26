@@ -58,7 +58,7 @@ if [[ -e "$zip_file" ]]; then
 				brotli -f -$l tmp/system.new.dat
 				echo Brotli compression complete.
 			else
-				./img2sdat/img2sdat.py $sparse -o tmp | grep
+				./img2sdat/img2sdat.py $sparse -o tmp
 			fi
     	fi
 	fi
